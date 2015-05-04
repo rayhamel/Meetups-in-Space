@@ -1,0 +1,57 @@
+<% if params[:joined] == 'true' %>
+<h1>Successfully joined!</h1>
+<% elsif params[:joined] == 'false' %>
+<h1>Error: not successfully joined.</h1>
+<% end %>
+
+<% if params[:left] == 'true' %>
+<h1>Successfully left!</h1>
+<% elsif params[:left] == 'false' %>
+<h1>Error: not successfully left.</h1>
+<% end %>
+
+<h1><%= @meetup.name %></h1>
+
+<h3>Location</h3>
+<%= @meetup.location %>
+<h3>Description</h3>
+<%= @meetup.description %>
+<h3>Who's going?</h3>
+<% @meetup.users.each do |user| %>
+  <img src="<%= user.avatar_url %>" alt="<%= user.username %>" /><br><%= user.username %>
+  <br>
+<% end %>
+
+<h3>What are people saying?</h3>
+<div id="comments_section">
+  <% @meetup.comments.reverse_each do |comment| %>
+    <p><strong><%= comment.user.username %>: <%= comment.title %></strong></p>
+    <p><%= comment.text %></p>
+  <% end %>
+</div>
+
+
+<% if session[:user_id] && @meetup.users.include?(User.find(session[:user_id])) %>
+  <form action="/meetups/<%= params[:id] %>/comments" method="post">
+    <div>
+      <label for="title">Comment Title</label>
+      <input class="form" type="text" id="title" name="title" value="<%= title %>">
+    </div>
+    <br>
+    <div>
+      <label for="text">Comment</label>
+      <input class="form" type="text" id="text" name="text" value="<%= text %>">
+    </div>
+    <input id="submit_comment" class="form" type="submit" value="New Comment">
+  </form>
+<% end %>
+
+<% if session[:user_id] && @meetup.users.include?(User.find(session[:user_id])) %>
+  <form action="/meetups/<%= params[:id] %>/leave" method="post">
+    <input class="form" type="submit" value="Leave this meetup">
+  </form>
+<% else %>
+  <form action="/meetups/<%= params[:id] %>/join" method="post">
+    <input class="form" type="submit" value="Join this meetup">
+  </form>
+<% end %>
